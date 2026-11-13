@@ -1,0 +1,44 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: disasterlink-api
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://127.0.0.1:5432/app_db}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      # The Node.js service owns migrations in this repository. Use `validate`
+      # in production after running `drizzle-kit push`; `update` is convenient
+      # for a standalone Java deployment / local experiments.
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+disasterlink:
+  # Keyless public weather provider. Called server-side only.
+  weather:
+    base-url: https://api.open-meteo.com/v1/forecast
+    cache-ttl-minutes: 15
+    timeout-seconds: 8
+  # Official warning ingestion is intentionally disabled: no fabricated alerts.
+  warnings:
+    ingestion-enabled: false
+  cors:
+    allowed-origins: ${FRONTEND_ORIGIN:http://localhost:3000}
+
+logging:
+  level:
+    in.disasterlink: INFO
